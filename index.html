@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="tg">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BorGo — Боркашонии зуд</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<style>
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; background:#EEF2F6; color:#0F1B2D; }
+  svg.lucide { width:1rem; height:1rem; flex-shrink:0; }
+  .ic-lg svg.lucide, svg.lucide.ic-lg { width:1.5rem; height:1.5rem; }
+  .ic-xl svg.lucide { width:2rem; height:2rem; }
+  .toast { animation: pop .25s ease-out; }
+  @keyframes pop { from { transform: translateY(12px); opacity:0 } to { transform:none; opacity:1 } }
+  button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visible { outline:2px solid #0F1B2D; outline-offset:2px; }
+  @media (prefers-reduced-motion: reduce) { .toast { animation:none } }
+</style>
+</head>
+<body>
+
+<div id="cdn-warning" class="hidden bg-red-600 text-white text-sm px-4 py-2 text-center">
+  Услубҳои Tailwind бор нашуданд. Пайвасти интернетро санҷед ва саҳифаро аз нав кушоед.
+</div>
+
+<header class="sticky top-0 z-20 bg-slate-900 text-white shadow">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-2.5">
+      <span class="w-9 h-9 rounded-lg bg-amber-400 text-slate-900 flex items-center justify-center"><i data-lucide="truck"></i></span>
+      <span class="text-lg font-bold tracking-tight">BorGo</span>
+    </div>
+    <nav class="flex bg-slate-800 rounded-lg p-1 gap-1" role="tablist" aria-label="Реҷаи интерфейс">
+      <button id="tab-customer" type="button" role="tab" class="px-3 sm:px-4 py-2 rounded-md text-sm font-semibold flex items-center gap-2">
+        <i data-lucide="package"></i><span>Соҳиби бор</span>
+      </button>
+      <button id="tab-driver" type="button" role="tab" class="px-3 sm:px-4 py-2 rounded-md text-sm font-semibold flex items-center gap-2">
+        <i data-lucide="steering-wheel"></i><span>Ронанда</span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-6">
+
+  <!-- ===== Реҷаи соҳиби бор ===== -->
+  <section id="view-customer" class="grid lg:grid-cols-5 gap-6">
+    <form id="order-form" class="lg:col-span-3 bg-white rounded-xl border border-slate-200 p-5 sm:p-6 space-y-5" novalidate>
+      <div>
+        <h1 class="text-xl font-bold">Фармоиши нави боркашонӣ</h1>
+        <p class="text-sm text-slate-500 mt-1">Масир, мошин ва маълумоти тамосро пур кунед. Нарх худкор ҳисоб мешавад.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4">
+        <label class="block">
+          <span class="text-sm font-semibold flex items-center gap-1.5 mb-1.5"><i data-lucide="map-pin"></i>Нуқтаи баромад</span>
+          <input id="from" type="text" maxlength="80" autocomplete="off" placeholder="Маркази шаҳр, кӯча ё ноҳия" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base">
+        </label>
+        <label class="block">
+          <span class="text-sm font-semibold flex items-center gap-1.5 mb-1.5"><i data-lucide="flag"></i>Нуқтаи расидан</span>
+          <input id="to" type="text" maxlength="80" autocomplete="off" placeholder="Маркази шаҳр, кӯча ё ноҳия" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base">
+        </label>
+      </div>
+
+      <label class="block">
+        <span class="text-sm font-semibold flex items-center gap-1.5 mb-1.5"><i data-lucide="route"></i>Масофа (километр)</span>
+        <input id="km" type="number" min="1" max="3000" step="1" inputmode="numeric" placeholder="Масалан, 120" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base">
+      </label>
+
+      <div>
+        <span class="text-sm font-semibold block mb-2">Интихоби мошин</span>
+        <div id="vehicles" class="grid sm:grid-cols-3 gap-3"></div>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4">
+        <label class="block">
+          <span class="text-sm font-semibold flex items-center gap-1.5 mb-1.5"><i data-lucide="user"></i>Ному насаби фармоишгар</span>
+          <input id="name" type="text" maxlength="60" autocomplete="name" placeholder="Масалан, Алишер Раҳимов" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base">
+        </label>
+        <label class="block">
+          <span class="text-sm font-semibold flex items-center gap-1.5 mb-1.5"><i data-lucide="phone"></i>Рақами телефон</span>
+          <input id="phone" type="tel" maxlength="20" autocomplete="tel" inputmode="tel" placeholder="+992 900 00 00 00" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base">
+        </label>
+      </div>
+
+      <label class="block">
+        <span class="text-sm font-semibold flex items-center gap-1.5 mb-1.5"><i data-lucide="message-square"></i>Шарҳ барои ронанда (ихтиёрӣ)</span>
+        <textarea id="note" rows="2" maxlength="200" placeholder="Намуди бор, вазн, суроғаи дақиқ" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base resize-none"></textarea>
+      </label>
+
+      <div class="rounded-xl bg-slate-900 text-white p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div class="text-sm text-slate-300">Нархи тахминии интиқол</div>
+          <div class="text-2xl font-bold" id="price">—</div>
+          <div class="text-xs text-slate-400 mt-0.5" id="price-meta">Масофаро ворид кунед</div>
+        </div>
+        <button type="submit" class="bg-amber-400 text-slate-900 font-bold rounded-lg px-5 py-3 flex items-center justify-center gap-2 hover:bg-amber-300">
+          <i data-lucide="send"></i>Фармоиш додан
+        </button>
+      </div>
+      <p id="form-error" class="hidden text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2" role="alert"></p>
+    </form>
+
+    <aside class="lg:col-span-2">
+      <h2 class="text-lg font-bold mb-3 flex items-center gap-2"><i data-lucide="list-checks"></i>Фармоишҳои ман</h2>
+      <div id="my-orders" class="space-y-3"></div>
+    </aside>
+  </section>
+
+  <!-- ===== Реҷаи ронанда ===== -->
+  <section id="view-driver" class="hidden space-y-5">
+    <div class="grid grid-cols-3 gap-3" id="driver-stats"></div>
+    <div class="flex flex-wrap gap-2" id="driver-filters" role="tablist" aria-label="Филтри фармоишҳо"></div>
+    <div id="driver-orders" class="grid md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+  </section>
+</main>
+
+<div id="toasts" class="fixed bottom-4 inset-x-4 sm:inset-x-auto sm:right-4 sm:w-96 z-30 space-y-2"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- Маълумоти собит ---------- */
+  var VEHICLES = {
+    gazel:  { name: 'ГАЗель',        cap: '1,5 тонна',  base: 50,  perKm: 3,   icon: 'truck' },
+    furgon: { name: 'Фургон',        cap: '3 тонна',    base: 90,  perKm: 4.5, icon: 'box' },
+    kamaz:  { name: 'Овох / Камаз',  cap: '10+ тонна',  base: 200, perKm: 8,   icon: 'container' }
+  };
+  var STATUS = {
+    pending:   { label: 'Интизорӣ', cls: 'bg-slate-100 text-slate-700',   icon: 'clock' },
+    progress:  { label: 'Дар роҳ',  cls: 'bg-amber-100 text-amber-800',   icon: 'truck' },
+    completed: { label: 'Иҷро шуд', cls: 'bg-emerald-100 text-emerald-800', icon: 'check-circle-2' }
+  };
+  var FILTERS = [['all', 'Ҳама'], ['pending', 'Нав'], ['progress', 'Дар роҳ'], ['completed', 'Иҷро шуд']];
+  var KEY = 'borgo.orders.v2', ME = 'borgo.me.v2';
+
+  /* ---------- Захира (бо захираи эҳтиётӣ дар хотира) ---------- */
+  var memStore = {};
+  function sGet(k) { try { return localStorage.getItem(k); } catch (e) { return memStore[k] || null; } }
+  function sSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { memStore[k] = v; } }
+
+  var me = sGet(ME);
+  if (!me) { me = 'u' + Math.random().toString(36).slice(2, 10); sSet(ME, me); }
+
+  function load() { try { var a = JSON.parse(sGet(KEY)); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  function save() { sSet(KEY, JSON.stringify(orders)); }
+
+  var orders = load();
+  var ui = { role: 'customer', vehicle: 'gazel', filter: 'all' };
+
+  /* ---------- Кӯмаккунандаҳо ---------- */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function money(n) { return Math.round(n).toLocaleString('ru-RU') + ' сомонӣ'; }
+  function icons() { if (window.lucide && lucide.createIcons) { try { lucide.createIcons(); } catch (e) {} } }
+  function ico(name, extra) { return '<i data-lucide="' + name + '"' + (extra ? ' class="' + extra + '"' : '') + '></i>'; }
+  function ago(ts) {
+    var m = Math.floor((Date.now() - ts) / 60000);
+    if (m < 1) return 'ҳоло';
+    if (m < 60) return m + ' дақ. пеш';
+    var h = Math.floor(m / 60);
+    return h < 24 ? h + ' соат пеш' : Math.floor(h / 24) + ' рӯз пеш';
+  }
+  function cleanPhone(p) { return String(p).replace(/[^\d+]/g, ''); }
+  function phoneOk(p) { return cleanPhone(p).replace(/\D/g, '').length >= 9; }
+
+  function toast(msg, type) {
+    var t = document.createElement('div');
+    var ok = type !== 'warn';
+    t.className = 'toast text-sm rounded-lg px-4 py-3 shadow-lg flex items-start gap-2 ' + (ok ? 'bg-slate-900 text-white' : 'bg-red-600 text-white');
+    t.setAttribute('role', 'status');
+    t.innerHTML = ico(ok ? 'bell-ring' : 'alert-triangle', 'mt-0.5') + '<span>' + esc(msg) + '</span>';
+    $('toasts').appendChild(t);
+    icons();
+    setTimeout(function () { t.remove(); }, 3500);
+  }
+
+  /* ---------- Калкулятори нарх ---------- */
+  function calc() {
+    var km = parseFloat($('km').value);
+    if (!km || km <= 0) return null;
+    var v = VEHICLES[ui.vehicle];
+    return { km: km, total: Math.round((v.base + km * v.perKm) / 5) * 5 };
+  }
+  function updatePrice() {
+    var p = calc(), v = VEHICLES[ui.vehicle];
+    $('price').textContent = p ? money(p.total) : '—';
+    $('price-meta').textContent = p
+      ? v.name + ': ' + v.base + ' сомонӣ + ' + p.km + ' км × ' + v.perKm + ' сомонӣ'
+      : 'Масофаро ворид кунед';
+  }
+
+  /* ---------- Интихоби мошин ---------- */
+  function renderVehicles() {
+    $('vehicles').innerHTML = Object.keys(VEHICLES).map(function (k) {
+      var v = VEHICLES[k], on = ui.vehicle === k;
+      return '<button type="button" data-vehicle="' + k + '" aria-pressed="' + on + '" class="text-left rounded-lg border-2 p-3 transition ' +
+        (on ? 'border-slate-900 bg-amber-50' : 'border-slate-200 bg-white hover:border-slate-400') + '">' +
+        '<span class="flex items-center justify-between">' +
+        '<span class="w-10 h-10 rounded-lg flex items-center justify-center ' + (on ? 'bg-amber-400 text-slate-900' : 'bg-slate-100 text-slate-600') + '">' + ico(v.icon, 'ic-lg') + '</span>' +
+        (on ? ico('check-circle-2', 'text-emerald-600') : '') + '</span>' +
+        '<span class="block font-semibold text-sm mt-2">' + v.name + '</span>' +
+        '<span class="block text-xs text-slate-500">' + v.cap + '</span>' +
+        '<span class="block text-xs font-semibold mt-1">аз ' + v.base + ' сомонӣ</span></button>';
+    }).join('');
+    icons();
+  }
+
+  /* ---------- Сабти фармоиш ---------- */
+  function showError(msg) {
+    var e = $('form-error');
+    e.textContent = msg; e.classList.toggle('hidden', !msg);
+  }
+  function submitOrder(ev) {
+    ev.preventDefault();
+    var from = $('from').value.trim(), to = $('to').value.trim(),
+        name = $('name').value.trim(), phone = $('phone').value.trim(), p = calc();
+    var err = '';
+    if (!from) err = 'Нуқтаи баромадро ворид кунед.';
+    else if (!to) err = 'Нуқтаи расиданро ворид кунед.';
+    else if (!p) err = 'Масофаро бо километр ворид кунед.';
+    else if (!name) err = 'Ном ва насабро ворид кунед.';
+    else if (!phoneOk(phone)) err = 'Рақами телефонро дуруст ворид кунед (на камтар аз 9 рақам).';
+    showError(err);
+    if (err) return;
+
+    orders = load();
+    orders.unshift({
+      id: 'BG-' + Date.now().toString(36).toUpperCase().slice(-5),
+      from: from, to: to, km: p.km, vehicle: ui.vehicle, price: p.total,
+      name: name, phone: phone, note: $('note').value.trim(),
+      status: 'pending', createdAt: Date.now(), customerId: me, driverId: null
+    });
+    save();
+    ['from', 'to', 'km', 'note'].forEach(function (id) { $(id).value = ''; });
+    updatePrice(); renderAll();
+    toast('Фармоиши шумо бомуваффақият сабт шуд');
+  }
+
+  /* ---------- Қисмҳои умумии карточка ---------- */
+  function pill(status) {
+    var s = STATUS[status];
+    return '<span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ' + s.cls + '">' + ico(s.icon) + s.label + '</span>';
+  }
+  function routeBlock(o) {
+    return '<div class="flex items-start gap-3"><div class="flex flex-col items-center pt-1">' +
+      '<span class="w-2.5 h-2.5 rounded-full bg-slate-900"></span><span class="w-0.5 h-6 bg-slate-300"></span><span class="w-2.5 h-2.5 rounded-full bg-amber-400 ring-2 ring-slate-900"></span></div>' +
+      '<div class="min-w-0 space-y-2"><div><div class="text-xs text-slate-500">Аз куҷо</div><div class="font-semibold break-words">' + esc(o.from) + '</div></div>' +
+      '<div><div class="text-xs text-slate-500">Ба куҷо</div><div class="font-semibold break-words">' + esc(o.to) + '</div></div></div></div>';
+  }
+  function chips(o) {
+    var v = VEHICLES[o.vehicle] || VEHICLES.gazel;
+    return '<div class="flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-600 mt-3">' +
+      '<span class="flex items-center gap-1.5">' + ico(v.icon) + esc(v.name) + '</span>' +
+      '<span class="flex items-center gap-1.5">' + ico('route') + o.km + ' км</span></div>';
+  }
+
+  /* ---------- Фармоишҳои ман ---------- */
+  function renderMine() {
+    var mine = orders.filter(function (o) { return o.customerId === me; });
+    $('my-orders').innerHTML = mine.length ? mine.map(function (o) {
+      var cancel = o.status === 'pending'
+        ? '<button type="button" data-cancel="' + o.id + '" class="text-sm text-red-600 font-semibold flex items-center gap-1 hover:underline">' + ico('x') + 'Бекор кардан</button>' : '';
+      return '<article class="bg-white rounded-xl border border-slate-200 p-4">' +
+        '<div class="flex justify-between items-center gap-2 mb-3">' + pill(o.status) + '<span class="text-xs text-slate-400">' + o.id + ' · ' + ago(o.createdAt) + '</span></div>' +
+        routeBlock(o) + chips(o) +
+        '<div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-100"><span class="font-bold">' + money(o.price) + '</span>' + cancel + '</div></article>';
+    }).join('') : emptyBox('Ҳоло фармоиш нест', 'Формаро пур кунед — фармоиш дар ин ҷо пайгирӣ мешавад.');
+  }
+  function emptyBox(title, sub) {
+    return '<div class="rounded-xl border border-dashed border-slate-300 bg-white/70 p-8 text-center text-slate-500">' +
+      '<div class="flex justify-center mb-2 text-slate-400 ic-xl">' + ico('inbox') + '</div>' +
+      '<p class="font-semibold text-slate-700">' + title + '</p><p class="text-sm mt-1">' + sub + '</p></div>';
+  }
+
+  /* ---------- Панели ронанда ---------- */
+  function renderDriver() {
+    var count = function (s) { return orders.filter(function (o) { return o.status === s; }).length; };
+    var earned = orders.filter(function (o) { return o.status === 'completed' && o.driverId === me; })
+      .reduce(function (a, o) { return a + o.price; }, 0);
+    $('driver-stats').innerHTML = [
+      ['inbox', 'Фармоишҳои нав', count('pending')],
+      ['truck', 'Дар роҳ', count('progress')],
+      ['coins', 'Даромади ман', money(earned)]
+    ].map(function (s) {
+      return '<div class="bg-white rounded-xl border border-slate-200 p-3 sm:p-4"><div class="flex items-center gap-1.5 text-xs sm:text-sm text-slate-500">' + ico(s[0]) + s[1] +
+        '</div><div class="text-base sm:text-xl font-bold mt-1 break-words">' + s[2] + '</div></div>';
+    }).join('');
+
+    $('driver-filters').innerHTML = FILTERS.map(function (f) {
+      var on = ui.filter === f[0];
+      var n = f[0] === 'all' ? orders.length : count(f[0]);
+      return '<button type="button" role="tab" aria-selected="' + on + '" data-filter="' + f[0] + '" class="px-3.5 py-2 rounded-lg text-sm font-semibold border ' +
+        (on ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-700 border-slate-300 hover:border-slate-500') + '">' + f[1] + ' (' + n + ')</button>';
+    }).join('');
+
+    var list = orders.filter(function (o) { return ui.filter === 'all' || o.status === ui.filter; });
+    $('driver-orders').innerHTML = list.length ? list.map(driverCard).join('') :
+      '<div class="md:col-span-2 xl:col-span-3">' + emptyBox('Фармоиш ёфт нашуд', 'Фармоишҳои нав аз реҷаи «Соҳиби бор» дар ин ҷо пайдо мешаванд.') + '</div>';
+  }
+  function driverCard(o) {
+    var action = '';
+    if (o.status === 'pending') {
+      action = '<button type="button" data-accept="' + o.id + '" class="w-full bg-slate-900 text-white font-semibold rounded-lg px-4 py-3 flex items-center justify-center gap-2 hover:bg-slate-700">' + ico('check') + 'Қабул кардан</button>';
+    } else if (o.status === 'progress') {
+      action = o.driverId === me
+        ? '<button type="button" data-complete="' + o.id + '" class="w-full bg-emerald-600 text-white font-semibold rounded-lg px-4 py-3 flex items-center justify-center gap-2 hover:bg-emerald-700">' + ico('check-circle-2') + 'Иҷро шуд</button>'
+        : '<p class="text-sm text-slate-500 text-center">Ронандаи дигар қабул кардааст</p>';
+    } else {
+      action = '<p class="text-sm text-emerald-700 font-semibold text-center flex items-center justify-center gap-1.5">' + ico('check-circle-2') + 'Фармоиш иҷро шуд</p>';
+    }
+    return '<article class="bg-white rounded-xl border border-slate-200 p-4 flex flex-col">' +
+      '<div class="flex justify-between items-center gap-2 mb-3">' + pill(o.status) + '<span class="text-xs text-slate-400">' + o.id + ' · ' + ago(o.createdAt) + '</span></div>' +
+      routeBlock(o) + chips(o) +
+      '<div class="mt-3 rounded-lg bg-slate-50 p-3 text-sm space-y-1.5">' +
+        '<div class="flex items-center gap-2">' + ico('user', 'text-slate-500') + '<span class="font-medium break-words">' + esc(o.name) + '</span></div>' +
+        '<a href="tel:' + esc(cleanPhone(o.phone)) + '" class="flex items-center gap-2 text-blue-700 font-medium hover:underline">' + ico('phone') + esc(o.phone) + '</a>' +
+        (o.note ? '<div class="flex items-start gap-2 text-slate-600">' + ico('message-square', 'mt-0.5') + '<span class="break-words">' + esc(o.note) + '</span></div>' : '') +
+      '</div>' +
+      '<div class="flex items-center justify-between my-3"><span class="text-sm text-slate-500">Нарх</span><span class="text-lg font-bold">' + money(o.price) + '</span></div>' +
+      '<div class="mt-auto">' + action + '</div></article>';
+  }
+
+  /* ---------- Амалҳо (delegation) ---------- */
+  function setStatus(id, status, msg) {
+    orders = load();
+    var o = orders.find(function (x) { return x.id === id; });
+    if (!o) return;
+    if (status === 'progress') {
+      if (o.status !== 'pending') { toast('Ин фармоишро ронандаи дигар қабул кардааст', 'warn'); renderAll(); return; }
+      o.driverId = me;
+    }
+    o.status = status; save(); renderAll(); toast(msg);
+  }
+  document.addEventListener('click', function (e) {
+    var t;
+    if ((t = e.target.closest('[data-vehicle]'))) { ui.vehicle = t.dataset.vehicle; renderVehicles(); updatePrice(); }
+    else if ((t = e.target.closest('[data-filter]'))) { ui.filter = t.dataset.filter; renderDriver(); icons(); }
+    else if ((t = e.target.closest('[data-accept]'))) { setStatus(t.dataset.accept, 'progress', 'Фармоиш қабул шуд — ҳолат: Дар роҳ'); }
+    else if ((t = e.target.closest('[data-complete]'))) { setStatus(t.dataset.complete, 'completed', 'Фармоиш иҷро шуд'); }
+    else if ((t = e.target.closest('[data-cancel]'))) {
+      orders = load();
+      var o = orders.find(function (x) { return x.id === t.dataset.cancel; });
+      if (o && o.status === 'pending') {
+        orders = orders.filter(function (x) { return x.id !== o.id; });
+        save(); renderAll(); toast('Фармоиш бекор карда шуд');
+      } else { renderAll(); }
+    }
+  });
+
+  /* ---------- Табҳои реҷа ---------- */
+  function renderTabs() {
+    [['customer', 'tab-customer'], ['driver', 'tab-driver']].forEach(function (p) {
+      var b = $(p[1]), on = ui.role === p[0];
+      b.className = 'px-3 sm:px-4 py-2 rounded-md text-sm font-semibold flex items-center gap-2 transition ' +
+        (on ? 'bg-amber-400 text-slate-900 shadow' : 'text-slate-300 hover:text-white hover:bg-slate-700');
+      b.setAttribute('aria-selected', on);
+    });
+    $('view-customer').classList.toggle('hidden', ui.role !== 'customer');
+    $('view-driver').classList.toggle('hidden', ui.role !== 'driver');
+  }
+  function setRole(r) { ui.role = r; renderAll(); window.scrollTo(0, 0); }
+
+  function renderAll() { renderTabs(); renderMine(); renderDriver(); icons(); }
+
+  /* ---------- Оғоз ---------- */
+  function init() {
+    $('tab-customer').addEventListener('click', function () { setRole('customer'); });
+    $('tab-driver').addEventListener('click', function () { setRole('driver'); });
+    $('order-form').addEventListener('submit', submitOrder);
+    ['km'].forEach(function (id) { $(id).addEventListener('input', updatePrice); });
+    window.addEventListener('storage', function (e) {
+      if (e.key !== KEY) return;
+      var before = orders.filter(function (o) { return o.status === 'pending'; }).length;
+      orders = load(); renderAll();
+      var after = orders.filter(function (o) { return o.status === 'pending'; }).length;
+      if (ui.role === 'driver' && after > before) toast('Фармоиши нав омад');
+    });
+    setInterval(function () { renderMine(); renderDriver(); icons(); }, 30000);
+    if (typeof window.tailwind === 'undefined') $('cdn-warning').classList.remove('hidden');
+    renderVehicles(); updatePrice(); renderAll();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+</body>
+</html>
